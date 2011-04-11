@@ -6,7 +6,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = ['pyramid', 'WebError', 'sqlalchemy']
+requires = ['pyramid', 'WebError', 'sqlalchemy', 'beaker']
 
 setup(name='CMStats',
       version='0.4',

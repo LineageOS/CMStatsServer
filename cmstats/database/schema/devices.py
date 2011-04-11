@@ -1,7 +1,9 @@
 from cmstats.database import Base, DBSession
+from cmstats.utils.cache import cache
 from cmstats.utils.string import parse_modversion
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql.expression import func
+import datetime
 
 
 class Device(Base):
@@ -29,6 +31,17 @@ class Device(Base):
         session = DBSession()
         q = session.query(cls).filter(cls.kang == 0).count()
         return q
+
+    @classmethod
+    def count(cls):
+        count_cache = cache.get_cache('count', expire=1)
+        def get_from_database():
+            session = DBSession()
+            q = session.query(cls).count()
+            return q
+
+        total = count_cache.get('count', createfunc=get_from_database)
+        return total
 
     @classmethod
     def device_count(cls):
@@ -86,3 +99,10 @@ class Device(Base):
 
         session.add(obj)
         session.commit()
+
+    @classmethod
+    def count_last_day(cls):
+        timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)
+        session = DBSession()
+        q = session.query(cls).filter(cls.date_added > timestamp).count()
+        return q

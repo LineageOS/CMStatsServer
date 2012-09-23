@@ -17,7 +17,7 @@ def parse_modversion(modversion):
         return "%s-RC%s" % (match_rc.group(2), match_rc.group(3))
 
     elif match_nightly:
-        return "Nightly"
+        return "Nightly-%s" % (match_nightly.group(2))
 
     elif match_stable:
         return match_stable.group(2)

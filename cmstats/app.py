@@ -10,6 +10,7 @@ from ConfigParser import ConfigParser
 from tornado.options import define, options
 from tornado.ioloop import IOLoop
 from sqlalchemy import create_engine
+from Queue import Queue
 
 from model import DBSession, init_database
 from handlers import SubmitHandler
@@ -39,9 +40,14 @@ class Application(tornado.web.Application):
         init_database(create_engine(config.get('database', 'uri')))
         self.db = DBSession
 
+        # Queues
+        self.queues = {
+            'database': Queue()
+        }
+
         # Background threads
         self.threads = {
-            'database': DatabaseThread()
+            'database': DatabaseThread(self.queues['database'])
         }
 
         for thread in self.threads.itervalues():

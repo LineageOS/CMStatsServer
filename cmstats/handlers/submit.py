@@ -4,7 +4,6 @@ import logging
 from tornado.web import asynchronous
 
 from cmstats.handlers import BaseHandler
-from cmstats.model.schema.devices import Device
 
 
 class SubmitHandler(BaseHandler):
@@ -43,7 +42,7 @@ class SubmitHandler(BaseHandler):
                 return incomplete()
 
         # Create device record.
-        Device.add(**kwargs)
+        self.queue('database').put(kwargs)
 
         self.write("Thanks!")
         self.finish()

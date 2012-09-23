@@ -12,7 +12,7 @@ from sqlalchemy import create_engine
 from Queue import Queue
 
 from model import DBSession, init_database
-from handlers import SubmitHandler
+from handlers import SubmitHandler, ApiHandler
 from threads import DatabaseThread
 
 define('port', 6543)
@@ -22,6 +22,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/submit", SubmitHandler),
+            (r"/api", ApiHandler),
         ]
 
         settings = {

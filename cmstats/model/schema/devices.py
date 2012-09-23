@@ -1,3 +1,4 @@
+from cmstats import cache
 from cmstats.model import Base, DBSession
 from cmstats.utils.string import parse_modversion
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
@@ -22,51 +23,99 @@ class Device(Base):
 
     @classmethod
     def count_kang(cls):
-        session = DBSession()
-        q = session.query(func.count(cls.id)).filter(cls.kang == True).one()[0]
-        return q
+        cache_key = "count_kang"
+        def get_from_database():
+            session = DBSession()
+            q = session.query(func.count(cls.id)).filter(cls.kang == True).one()[0]
+            return q
+
+        result = cache.get(cache_key)
+        if result is None:
+            result = cache.set(cache_key, get_from_database())
+
+        return result
 
     @classmethod
     def count_nonkang(cls):
-        session = DBSession()
-        q = session.query(func.count(cls.id)).filter(cls.kang == False).one()[0]
-        return q
+        cache_key = "count_nonkang"
+        def get_from_database():
+            session = DBSession()
+            q = session.query(func.count(cls.id)).filter(cls.kang == False).one()[0]
+            return q
+
+        result = cache.get(cache_key)
+        if result is None:
+            result = cache.set(cache_key, get_from_database())
+
+        return result
 
     @classmethod
     def device_count(cls):
-        session = DBSession()
+        cache_key = "device_count"
+        def get_from_database():
+            session = DBSession()
+    
+            q = session.query(func.count(cls.name), cls.name) \
+                .group_by(cls.name).all()
+    
+            q = sorted(q, key=lambda x: x[0], reverse=True)
+    
+            return q
 
-        q = session.query(func.count(cls.name), cls.name) \
-            .group_by(cls.name).all()
+        result = cache.get(cache_key)
+        if result is None:
+            result = cache.set(cache_key, get_from_database())
 
-        q = sorted(q, key=lambda x: x[0], reverse=True)
-
-        return q
+        return result
 
     @classmethod
     def version_count(cls):
-        session = DBSession()
+        cache_key = "version_count"
+        def get_from_database():
+            session = DBSession()
+    
+            q = session.query(func.count(cls.version), cls.version) \
+                .filter(cls.kang == False) \
+                .group_by(cls.version).all()
+    
+            q = sorted(q, key=lambda x: x[0], reverse=True)
+    
+            return q
 
-        q = session.query(func.count(cls.version), cls.version) \
-            .filter(cls.kang == False) \
-            .group_by(cls.version).all()
+        result = cache.get(cache_key)
+        if result is None:
+            result = cache.set(cache_key, get_from_database())
 
-        q = sorted(q, key=lambda x: x[0], reverse=True)
-
-        return q
+        return result
 
     @classmethod
     def country_count(cls):
-        session = DBSession()
-        q = session.query(cls.country, func.count('*').label('count')).group_by(cls.country).all()
-        return q
+        cache_key = "country_count"
+        def get_from_database():
+           session = DBSession()
+           q = session.query(cls.country, func.count('*').label('count')).group_by(cls.country).all()
+           return q
+
+        result = cache.get(cache_key)
+        if result is None:
+            result = cache.set(cache_key, get_from_database())
+
+        return result
 
     @classmethod
     def count_last_day(cls):
-        timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)
-        session = DBSession()
-        q = session.query(cls).filter(cls.date_added > timestamp).count()
-        return q
+        cache_key = "count_last_day"
+        def get_from_database():
+            timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)
+            session = DBSession()
+            q = session.query(cls).filter(cls.date_added > timestamp).count()
+            return q
+
+        result = cache.get(cache_key)
+        if result is None:
+            result = cache.set(cache_key, get_from_database())
+
+        return result
 
     @classmethod
     def add(cls, **kwargs):

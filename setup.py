@@ -1,37 +1,16 @@
-import os
-
 from setuptools import setup, find_packages
 
-here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+version = "2.0.0"
 
-requires = ['pyramid', 'WebError', 'sqlalchemy', 'pytest', 'pastescript', 'psycopg2']
-
-setup(name='CMStats',
-      version='0.9',
-      description='CMStats',
-      long_description=README + '\n\n' + CHANGES,
-      classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+setup(
+    name="CMStats",
+    version=version,
+    packages=find_packages(),
+    install_requires=['tornado==2.2', 'sqlalchemy', 'mako', 'psycopg2'],
+    entry_points={
+        'console_scripts': [
+            'cmstats.server=cmstats.app:run_server',
         ],
-      author='',
-      author_email='',
-      url='',
-      keywords='web pyramid pylons',
-      packages=find_packages(),
-      include_package_data=True,
-      zip_safe=False,
-      install_requires=requires,
-      tests_require=requires,
-      test_suite="cmstats",
-      entry_points="""\
-      [paste.app_factory]
-      main = cmstats:main
-      """,
-      paster_plugins=['pyramid'],
-      )
-
+    },
+    include_package_data=True,
+)

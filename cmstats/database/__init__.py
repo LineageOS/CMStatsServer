@@ -16,7 +16,7 @@ def populate_data():
     obj1.hash = "XYZ1"
     obj1.country = "ca"
     obj1.carrier_id = "310260"
-    obj1.kang = 0
+    obj1.kang = False
     obj1.version = "Nightly"
     obj1.name = "passion"
 
@@ -24,7 +24,7 @@ def populate_data():
     obj2.hash = "XYZ2"
     obj2.country = "us"
     obj2.carrier_id = "310260"
-    obj2.kang = 0
+    obj2.kang = False
     obj2.version = "Nightly"
     obj2.name = "vision"
 

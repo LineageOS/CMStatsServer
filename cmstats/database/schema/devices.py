@@ -1,6 +1,6 @@
 from cmstats.database import Base, DBSession
 from cmstats.utils.string import parse_modversion
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.sql.expression import func
 import datetime
 
@@ -15,20 +15,20 @@ class Device(Base):
     version_raw = Column('version_raw', String(255))
     country = Column('country', String(50), index=True)
     carrier_id = Column('carrier_id', String(50), index=True)
-    kang = Column('kang', Integer, index=True)
+    kang = Column('kang', Boolean, index=True)
     date_added = Column('date_added', DateTime)
     date_updated = Column('date_updated', DateTime)
 
     @classmethod
     def count_kang(cls):
         session = DBSession()
-        q = session.query(func.count(cls.id)).filter(cls.kang == 1).one()[0]
+        q = session.query(func.count(cls.id)).filter(cls.kang == True).one()[0]
         return q
 
     @classmethod
     def count_nonkang(cls):
         session = DBSession()
-        q = session.query(func.count(cls.id)).filter(cls.kang == 0).one()[0]
+        q = session.query(func.count(cls.id)).filter(cls.kang == False).one()[0]
         return q
 
     @classmethod
@@ -47,7 +47,7 @@ class Device(Base):
         session = DBSession()
 
         q = session.query(func.count(cls.version), cls.version) \
-            .filter(cls.kang == 0) \
+            .filter(cls.kang == False) \
             .group_by(cls.version).all()
 
         q = sorted(q, key=lambda x: x[0], reverse=True)
@@ -85,9 +85,9 @@ class Device(Base):
         # Flag this as a KANG if necessary.
         if version == None:
             version = kwargs['version']
-            obj.kang = 1
+            obj.kang = True
         else:
-            obj.kang = 0
+            obj.kang = False
 
         # Populate the rest of the records.
         obj.hash = kwargs['hash']

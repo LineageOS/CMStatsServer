@@ -6,7 +6,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = ['pyramid', 'WebError', 'sqlalchemy', 'pytest']
+requires = ['pyramid', 'WebError', 'sqlalchemy', 'pytest', 'pastescript', 'psycopg2']
 
 setup(name='CMStats',
       version='0.9',

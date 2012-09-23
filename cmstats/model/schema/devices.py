@@ -3,6 +3,7 @@ from cmstats.utils.string import parse_modversion
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.sql.expression import func
 import datetime
+import logging
 
 
 class Device(Base):
@@ -98,5 +99,17 @@ class Device(Base):
         obj.carrier_id = kwargs['carrier_id']
         obj.date_updated = func.now()
 
+        logging.info("Saving: %s" % obj)
+
         session.add(obj)
         session.commit()
+
+    def __str__(self):
+        return "%(class)s(hash=%(hash)s, name=%(name)s, version=%(version)s, version_raw=%(version_raw)s, country=%(country)s)" % {
+            'class': self.__class__.__name__,
+            'hash': self.hash,
+            'name': self.name,
+            'version': self.version,
+            'version_raw': self.version_raw,
+            'country': self.country,
+        }

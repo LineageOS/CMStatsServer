@@ -18,8 +18,8 @@ class DatabaseThread(threading.Thread):
             self.loop()
 
     def loop(self):
-        if self.queue.qsize() > 0:
-            logging.debug("queue size: %d" % self.queue.qsize())
+        if self.queue.qsize() > 1:
+            logging.info("Queue size: %d" % self.queue.qsize())
         try:
             work = self.queue.get_nowait()
             self.process_work(work)

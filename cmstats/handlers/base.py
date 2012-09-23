@@ -9,5 +9,12 @@ class BaseHandler(tornado.web.RequestHandler):
     def arguments(self):
         return self.request.arguments
 
+    def get_param(self, name, default=None):
+        params = self.request.arguments.get(name, [])
+        if params == []:
+            return default
+        else:
+            return params[0]
+
     def queue(self, name):
         return self.application.queues.get(name, None)

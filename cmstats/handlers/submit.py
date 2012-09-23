@@ -17,11 +17,11 @@ class SubmitHandler(BaseHandler):
             self.write("Incomplete Data")
             self.finish()
 
-        device_hash = self.arguments.get('device_hash', None)[0]
-        device_name = self.arguments.get('device_name', None)[0]
-        device_version = self.arguments.get('device_version', None)[0]
-        device_country = self.arguments.get('device_country', None)[0]
-        device_carrier_id = self.arguments.get('device_carrier_id', None)[0]
+        device_hash = self.get_param('device_hash', None)
+        device_name = self.get_param('device_name')
+        device_version = self.get_param('device_version', None)
+        device_country = self.get_param('device_country', None)
+        device_carrier_id = self.get_param('device_carrier_id', None)
 
         kwargs = {
             'hash': device_hash,

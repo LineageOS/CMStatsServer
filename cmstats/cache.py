@@ -26,6 +26,6 @@ class Cache(object):
             return None
 
     def set(self, key, value):
-        expires = time.time() + 600
+        expires = time.time() + 60
         self.store[key] = (value, expires)
         return value

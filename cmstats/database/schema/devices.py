@@ -22,13 +22,13 @@ class Device(Base):
     @classmethod
     def count_kang(cls):
         session = DBSession()
-        q = session.query(cls).filter(cls.kang == 1).count()
+        q = session.query(func.count(cls.id)).filter(cls.kang == 1).one()[0]
         return q
 
     @classmethod
     def count_nonkang(cls):
         session = DBSession()
-        q = session.query(cls).filter(cls.kang == 0).count()
+        q = session.query(func.count(cls.id)).filter(cls.kang == 0).one()[0]
         return q
 
     @classmethod

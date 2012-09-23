@@ -13,6 +13,7 @@ from sqlalchemy import create_engine
 
 from model import DBSession, init_database
 from handlers import SubmitHandler
+from threads import DatabaseThread
 
 define('port', 6543)
 define('debug', True)
@@ -38,6 +39,14 @@ class Application(tornado.web.Application):
         init_database(create_engine(config.get('database', 'uri')))
         self.db = DBSession
 
+        # Background threads
+        self.threads = {
+            'database': DatabaseThread()
+        }
+
+        for thread in self.threads.itervalues():
+            thread.start()
+
 def run_server():
     parser = argparse.ArgumentParser(description="CMStats Server")
     parser.add_argument('--port', dest='port', type=int, help="Port", default=6543)
@@ -50,9 +59,16 @@ def run_server():
     options.port = args.port
     options.config = args.config
 
-    server = tornado.httpserver.HTTPServer(Application(), xheaders=True)
+    app = Application()
+    server = tornado.httpserver.HTTPServer(app, xheaders=True)
     server.listen(int(options.port))
-    IOLoop.instance().start()
+    try:
+        IOLoop.instance().start()
+    except KeyboardInterrupt:
+        logging.debug("Shutting down all threads")
+        for thread in app.threads.itervalues():
+            thread.running = False
+
 
 if __name__ == '__main__':
     run_server()

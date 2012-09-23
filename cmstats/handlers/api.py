@@ -58,3 +58,9 @@ class ApiHandler(BaseHandler):
             'last_day': Device.count_last_day()
         }
         return self.success(result)
+
+    def method_get_total_installs(self):
+        kang = Device.count_kang()
+        official = Device.count_nonkang()
+
+        return self.success(kang + official)

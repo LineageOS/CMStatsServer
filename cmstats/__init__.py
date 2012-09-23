@@ -1,4 +1,4 @@
-from cmstats.database import DBSession, init_database
+from cmstats.model import DBSession, init_database
 from cmstats.resources import Root
 from pyramid.config import Configurator
 from sqlalchemy.engine import engine_from_config

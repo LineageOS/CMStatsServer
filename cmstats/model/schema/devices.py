@@ -1,4 +1,4 @@
-from cmstats.database import Base, DBSession
+from cmstats.model import Base, DBSession
 from cmstats.utils.string import parse_modversion
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.sql.expression import func

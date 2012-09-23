@@ -1,4 +1,4 @@
-from cmstats.database.base import AbstractTable
+from cmstats.model.base import AbstractTable
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
@@ -8,7 +8,7 @@ DBSession = scoped_session(sessionmaker())
 Base = declarative_base(cls=AbstractTable)
 
 def populate_data():
-    from cmstats.database.schema import Device
+    from cmstats.model.schema import Device
     session = DBSession()
 
     # Create some fake testing entries.
@@ -36,7 +36,7 @@ def init_database(engine):
     DBSession.configure(bind=engine)
 
     # Import ORM mapped objects.
-    __import__("cmstats.database.schema", globals(), locals(), ["*"])
+    __import__("cmstats.model.schema", globals(), locals(), ["*"])
 
     # Bind metadata to engine.
     Base.metadata.bind = engine

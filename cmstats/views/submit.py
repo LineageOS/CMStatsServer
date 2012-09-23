@@ -1,4 +1,4 @@
-from cmstats.database.schema.devices import Device
+from cmstats.model.schema.devices import Device
 from cmstats.resources import Root
 from pyramid.view import view_config
 

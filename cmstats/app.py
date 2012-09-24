@@ -38,6 +38,9 @@ class Application(tornado.web.Application):
         init_database(create_engine(config.get('database', 'uri')))
         self.db = DBSession
 
+        # Publish Key
+        self.publish_key = config.get('socketio', 'publish_key')
+
         # Queues
         self.queues = {
             'database': Queue()

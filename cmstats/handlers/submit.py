@@ -1,7 +1,11 @@
 import tornado.web
 import logging
+import urllib
+import json
+import pygeoip
 
 from tornado.web import asynchronous
+from tornado.httpclient import AsyncHTTPClient
 
 from cmstats.handlers import BaseHandler
 
@@ -41,8 +45,33 @@ class SubmitHandler(BaseHandler):
             if v == None:
                 return incomplete()
 
+        # Publish message, catch any exceptions while doing so as this isn't critical
+        try:
+            self.publish_message(kwargs)
+        except:
+            pass
+
         # Create device record.
         self.queue('database').put(kwargs)
 
         self.write("Thanks!")
         self.finish()
+
+    def publish_message(self, message):
+        ip = self.request.headers.get('X-Real-Ip')
+        gic = pygeoip.GeoIP('/usr/share/GeoIP/GeoIPCity.dat')
+        record = gic.record_by_addr(ip)
+        message.update({
+            'ip': ip,
+            'longitude': record['longitude'],
+            'latitude': record['latitude']
+        })
+        params = {
+            'channel': 'install',
+            'key': self.application.publish_key,
+            'message': json.dumps(message)
+        }
+        url = 'http://localhost:8080/publish?%s' % urllib.urlencode(params)
+
+        client = AsyncHTTPClient()
+        client.fetch(url, None)

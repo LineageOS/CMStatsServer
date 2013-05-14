@@ -51,11 +51,34 @@ class SubmitHandler(BaseHandler):
         except:
             pass
 
+        # Report event to Google Analytics
+        try:
+            self.report_google_analytics(kwargs)
+        except:
+            pass
+        
         # Create device record.
         self.queue('database').put(kwargs)
 
         self.write("Thanks!")
         self.finish()
+
+    def report_google_analytics(self, message):
+        payload = {
+                'v': 1,
+                'tid': 'UA-39737599-4',
+                't': 'event',
+                'cid': message['hash'],
+                'ec': message['name'],
+                'ea': message['version'],
+                'el': message['country']
+                }
+        url = "http://www.google-analytics.com/collect"
+
+        logging.debug("Submitting to Google Analytics: %s" % urllib.urlencode(payload))
+        client = AsyncHTTPClient()
+        client.fetch(url, None, method='POST', body=urllib.urlencode(payload))
+
 
     def publish_message(self, message):
         ip = self.request.headers.get('X-Real-Ip')

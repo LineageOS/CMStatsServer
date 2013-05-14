@@ -53,7 +53,8 @@ class SubmitHandler(BaseHandler):
 
         # Report event to Google Analytics
         try:
-            self.report_google_analytics(kwargs)
+            self.report_google_analytics_event(kwargs)
+            self.report_google_analytics_appview(kwargs)
         except:
             pass
         
@@ -63,12 +64,14 @@ class SubmitHandler(BaseHandler):
         self.write("Thanks!")
         self.finish()
 
-    def report_google_analytics(self, message):
+    def report_google_analytics_event(self, message):
         payload = {
                 'v': 1,
                 'tid': 'UA-39737599-4',
                 't': 'event',
+                'an': 'CyanogenMod',
                 'cid': message['hash'],
+                'av': message['version'],
                 'ec': message['name'],
                 'ea': message['version'],
                 'el': message['country']
@@ -79,6 +82,21 @@ class SubmitHandler(BaseHandler):
         client = AsyncHTTPClient()
         client.fetch(url, None, method='POST', body=urllib.urlencode(payload))
 
+    def report_google_analytics_appview(self, message):
+        payload = {
+                'v': 1,
+                'tid': 'UA-39737599-4',
+                't': 'appview',
+                'cid': message['hash'],
+                'an': 'CyanogenMod',
+                'av': message['version'],
+                'cd': ""
+                }
+        url = "http://www.google-analytics.com/collect"
+
+        logging.debug("Submitting to Google Analytics: %s" % urllib.urlencode(payload))
+        client = AsyncHTTPClient()
+        client.fetch(url, None, method='POST', body=urllib.urlencode(payload))
 
     def publish_message(self, message):
         ip = self.request.headers.get('X-Real-Ip')

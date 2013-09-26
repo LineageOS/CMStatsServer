@@ -56,7 +56,7 @@ class ApiHandler(BaseHandler):
             'total': official + kang,
             'device': sorted([(v,k) for k,v in summary.devices.iteritems()], key=lambda x: x[0], reverse=True)[:100],
             'version': sorted([(v,k) for k,v in summary.versions.iteritems()], key=lambda x: x[0], reverse=True)[:100],
-            'last_day': summary.last_day,
+            'last_day': Device.count_last_day()
         }
         return self.success(result)
 

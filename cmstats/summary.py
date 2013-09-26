@@ -4,7 +4,6 @@ class Summary(object):
         self.kang = 0
         self.official = 0
         self.submits = 0
-        self.last_day = 0
         self.devices = {}
         self.versions = {}
         self.databaseExceptions = 0

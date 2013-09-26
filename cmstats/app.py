@@ -65,7 +65,6 @@ class Application(tornado.web.Application):
         # Populate Summary
         summary.kang = Device.count_kang()
         summary.official = Device.count_nonkang()
-        summary.last_day = Device.count_last_day()
 
         versions = Device.version_count()
         for count, version in versions:
@@ -77,7 +76,7 @@ class Application(tornado.web.Application):
             summary.devices[device] = count
             logging.debug("%s => %s" % (device, count))
 
-        logging.info("Summary populated with kang=[%s], nonkang=[%s], lastday=[%s]" % (summary.kang, summary.official, summary.last_day))
+        logging.info("Summary populated with kang=[%s], nonkang=[%s]" % (summary.kang, summary.official))
 
         for thread in self.threads.itervalues():
             thread.start()

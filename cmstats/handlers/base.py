@@ -6,6 +6,10 @@ class BaseHandler(tornado.web.RequestHandler):
         return self.application.db
 
     @property
+    def summary(self):
+        return summary
+
+    @property
     def arguments(self):
         return self.request.arguments
 
@@ -18,3 +22,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def queue(self, name):
         return self.application.queues.get(name, None)
+    
+    @property
+    def health(self):
+        return self.application.health

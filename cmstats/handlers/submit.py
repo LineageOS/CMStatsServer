@@ -3,6 +3,7 @@ import logging
 import urllib
 import json
 import pygeoip
+import time
 
 from tornado.web import asynchronous
 from tornado.httpclient import AsyncHTTPClient
@@ -60,14 +61,21 @@ class SubmitHandler(BaseHandler):
         
         # Create device record.
         self.queue('database').put(kwargs)
-
+        self.health['lastCheckin'] = int(time.time())
         self.write("Thanks!")
         self.finish()
 
     def report_google_analytics_event(self, message):
+        def callback(response):
+            if response.error:
+                logging.error("Error while reporting event to Google Analytics: %s" % response.error)
+            else:
+                logging.debug("Successfully reported event to Google Analytics: %s" % response.code)
+                self.health['lastGAReport'] = int(time.time())
+
         payload = {
                 'v': 1,
-                'tid': 'UA-39737599-4',
+                #'tid': 'UA-39737599-4',
                 't': 'event',
                 'an': 'CyanogenMod',
                 'cid': message['hash'],
@@ -80,9 +88,16 @@ class SubmitHandler(BaseHandler):
 
         logging.debug("Submitting to Google Analytics: %s" % urllib.urlencode(payload))
         client = AsyncHTTPClient()
-        client.fetch(url, None, method='POST', body=urllib.urlencode(payload))
+        client.fetch(url, callback, method='POST', body=urllib.urlencode(payload))
 
     def report_google_analytics_appview(self, message):
+        def callback(response):
+            if response.error:
+                logging.error("Error while reporting view to Google Analytics: %s" % response.error)
+            else:
+                logging.debug("Successfully reported view to Google Analytics: %s" % response.code)
+                self.health['lastGAReport'] = int(time.time())
+
         payload = {
                 'v': 1,
                 'tid': 'UA-39737599-4',
@@ -96,7 +111,7 @@ class SubmitHandler(BaseHandler):
 
         logging.debug("Submitting to Google Analytics: %s" % urllib.urlencode(payload))
         client = AsyncHTTPClient()
-        client.fetch(url, None, method='POST', body=urllib.urlencode(payload))
+        client.fetch(url, callback, method='POST', body=urllib.urlencode(payload))
 
     def publish_message(self, message):
         ip = self.request.headers.get('X-Real-Ip')

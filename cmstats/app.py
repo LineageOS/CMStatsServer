@@ -12,8 +12,11 @@ from sqlalchemy import create_engine
 from Queue import Queue
 
 from model import DBSession, init_database
-from handlers import SubmitHandler, ApiHandler
+from handlers import SubmitHandler, ApiHandler, PingHandler
 from threads import DatabaseThread
+
+from cmstats import summary
+from cmstats.model.schema.devices import Device
 
 define('port', 6543)
 define('debug', True)
@@ -23,10 +26,12 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/submit", SubmitHandler),
             (r"/api", ApiHandler),
+            (r"/ping", PingHandler),
         ]
 
         settings = {
             'debug': options.debug,
+            'port': options.port
         }
 
         super(Application, self).__init__(handlers, **settings)
@@ -37,6 +42,12 @@ class Application(tornado.web.Application):
         # One global connection
         init_database(create_engine(config.get('database', 'uri')))
         self.db = DBSession
+
+        # Health Information
+        self.health = {
+                'lastGAReport': 0,
+                'lastCheckin': 0
+                }
 
         # Publish Key
         self.publish_key = config.get('socketio', 'publish_key')
@@ -50,6 +61,23 @@ class Application(tornado.web.Application):
         self.threads = {
             'database': DatabaseThread(self.queues['database'])
         }
+
+        # Populate Summary
+        summary.kang = Device.count_kang()
+        summary.official = Device.count_nonkang()
+        summary.last_day = Device.count_last_day()
+
+        versions = Device.version_count()
+        for count, version in versions:
+            summary.versions[version] = count
+            logging.debug("%s => %s" % (version, count))
+
+        devices = Device.device_count()
+        for count, device in devices:
+            summary.devices[device] = count
+            logging.debug("%s => %s" % (device, count))
+
+        logging.info("Summary populated with kang=[%s], nonkang=[%s], lastday=[%s]" % (summary.kang, summary.official, summary.last_day))
 
         for thread in self.threads.itervalues():
             thread.start()

@@ -6,6 +6,7 @@ from tornado.web import asynchronous
 
 from cmstats.handlers import BaseHandler
 from cmstats.model.schema.devices import Device
+from cmstats import summary
 
 
 class ApiHandler(BaseHandler):
@@ -47,20 +48,20 @@ class ApiHandler(BaseHandler):
         return self.finish()
 
     def method_get_counts(self):
-        kang = Device.count_kang()
-        official = Device.count_nonkang()
+        kang = summary.kang
+        official = summary.official
         result = {
             'kang': kang,
             'official': official,
             'total': official + kang,
-            'device': Device.device_count(),
-            'version': Device.version_count(),
-            'last_day': Device.count_last_day()
+            'device': sorted([(v,k) for k,v in summary.devices.iteritems()], key=lambda x: x[0], reverse=True)[:100],
+            'version': sorted([(v,k) for k,v in summary.versions.iteritems()], key=lambda x: x[0], reverse=True)[:100],
+            'last_day': summary.last_day,
         }
         return self.success(result)
 
     def method_get_total_installs(self):
-        kang = Device.count_kang()
-        official = Device.count_nonkang()
+        kang = summary.kang
+        official = summary.official
 
         return self.success(kang + official)

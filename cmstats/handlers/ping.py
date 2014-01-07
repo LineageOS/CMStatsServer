@@ -27,20 +27,6 @@ PAGE_TEMPLATE = """
     <br/>
     freeSpace - %(freeSpace)sMB
     <br/>
-    databaseDiff - %(databaseDiff)s
-    <br/>
-    officialDiff - %(officialDiff)s
-    <br/>
-    kangDiff - %(kangDiff)s
-    <br/>
-    summaryOfficial - %(summaryOfficial)s
-    <br/>
-    summaryKang - %(summaryKang)s
-    <br/>
-    countNonKang - %(countNonKang)s
-    <br/>
-    countKang - %(countKang)s
-    <br/>
     databaseExceptions - %(databaseExceptions)s
     <br/>
     databaseQueueSize - %(databaseQueueSize)s
@@ -70,16 +56,12 @@ class PingHandler(BaseHandler):
         if freeSpace < 512:
             status = '** ERROR **'
 
-        databaseDiff = (summary.official - Device.count_nonkang()) + (summary.kang - Device.count_kang())
-        if databaseDiff < 0 or databaseDiff > 5000:
-            status = '** ERROR **'
-
         databaseExceptions = summary.databaseExceptions
         if databaseExceptions > 1000:
             status = '** ERROR **'
 
         databaseQueueSize = self.queue('database').qsize()
-        if databaseQueueSize > 5000:
+        if databaseQueueSize > 2000:
             status = '** ERROR **'
 
         content = PAGE_TEMPLATE % {
@@ -91,13 +73,6 @@ class PingHandler(BaseHandler):
                 'lastCheckin': lastCheckin,
                 'freeSpace': freeSpace,
                 'totalCheckins': totalCheckins,
-                'databaseDiff': databaseDiff,
-                'officialDiff': (summary.official - Device.count_nonkang()),
-                'kangDiff': (summary.kang - Device.count_kang()),
-                'summaryOfficial': summary.official,
-                'summaryKang': summary.kang,
-                'countNonKang': Device.count_nonkang(),
-                'countKang': Device.count_kang(),
                 'databaseExceptions': databaseExceptions,
                 'databaseQueueSize': databaseQueueSize
                 }

@@ -6,7 +6,7 @@ setup(
     name="CMStats",
     version=version,
     packages=find_packages(),
-    install_requires=['tornado==2.2', 'sqlalchemy', 'mako', 'psycopg2', 'pygeoip'],
+    install_requires=['tornado==2.2', 'sqlalchemy', 'mako', 'pygeoip'],
     entry_points={
         'console_scripts': [
             'cmstats.server=cmstats.app:run_server',

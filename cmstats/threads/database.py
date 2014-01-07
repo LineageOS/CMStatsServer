@@ -31,7 +31,7 @@ class DatabaseThread(threading.Thread):
             if self.count > 0:
                 logging.warn("Saved %s checkins to the database." % self.count)
             self.count = 0
-            time.sleep(1)
+            time.sleep(5)
             return
 
     def process_work(self, work):

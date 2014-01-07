@@ -29,6 +29,18 @@ PAGE_TEMPLATE = """
     <br/>
     databaseDiff - %(databaseDiff)s
     <br/>
+    officialDiff - %(officialDiff)s
+    <br/>
+    kangDiff - %(kangDiff)s
+    <br/>
+    summaryOfficial - %(summaryOfficial)s
+    <br/>
+    summaryKang - %(summaryKang)s
+    <br/>
+    countNonKang - %(countNonKang)s
+    <br/>
+    countKang - %(countKang)s
+    <br/>
     databaseExceptions - %(databaseExceptions)s
   </body>
 </html>
@@ -74,6 +86,12 @@ class PingHandler(BaseHandler):
                 'freeSpace': freeSpace,
                 'totalCheckins': totalCheckins,
                 'databaseDiff': databaseDiff,
+                'officialDiff': (summary.official - Device.count_nonkang()),
+                'kangDiff': (summary.kang - Device.count_kang()),
+                'summaryOfficial': summary.official,
+                'summaryKang': summary.kang,
+                'countNonKang': Device.count_nonkang(),
+                'countKang': Device.count_kang(),
                 'databaseExceptions': databaseExceptions
                 }
 

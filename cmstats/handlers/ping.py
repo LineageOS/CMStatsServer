@@ -42,6 +42,8 @@ PAGE_TEMPLATE = """
     countKang - %(countKang)s
     <br/>
     databaseExceptions - %(databaseExceptions)s
+    <br/>
+    databaseQueueSize - %(databaseQueueSize)s
   </body>
 </html>
 """
@@ -76,6 +78,10 @@ class PingHandler(BaseHandler):
         if databaseExceptions > 1000:
             status = '** ERROR **'
 
+        databaseQueueSize = self.queue('database').qsize()
+        if databaseQueueSize > 5000:
+            status = '** ERROR **'
+
         content = PAGE_TEMPLATE % {
                 'version': __version__,
                 'hostname': socket.gethostname(),
@@ -92,7 +98,8 @@ class PingHandler(BaseHandler):
                 'summaryKang': summary.kang,
                 'countNonKang': Device.count_nonkang(),
                 'countKang': Device.count_kang(),
-                'databaseExceptions': databaseExceptions
+                'databaseExceptions': databaseExceptions,
+                'databaseQueueSize': databaseQueueSize
                 }
 
         self.write(content)
